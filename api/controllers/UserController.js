@@ -7,11 +7,30 @@
 
 module.exports = {
 
-  /* e.g.
-  sayHello: function (req, res) {
-    res.send('hello world!');
-  }
-  */
-  
+	me: function(req, res) {
 
+		User.find(req.session.user.id, function(err, user) {
+
+			if(err)
+				res.json({result:"unknown error"});
+
+			else {
+
+				Response.create({
+
+					code: 200,
+					result: "success",
+					timestamp: Date.now()
+
+				}).done(function(err, response) {
+
+					if(err)
+							res.json(err);
+					else 
+						res.json(response.serializeData(user));
+				});
+			}
+		});
+
+	}
 };
