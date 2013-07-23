@@ -1,6 +1,10 @@
 var Core = function(options) {
 
-	var exports = {};
+	if ( arguments.callee._singletonInstance )
+		return arguments.callee._singletonInstance;
+	arguments.callee._singletonInstance = this;
+
+	var exports = {options: options};
 
 	function config() {
 
@@ -16,13 +20,13 @@ var Core = function(options) {
 
 				Testing: {
 
-					level: 0,
+					level: 1,
 					text: "testing"
 				},
 
 				Production: {
 
-					level: 0,
+					level: 2,
 					text: "production"
 				},
 			},
@@ -41,21 +45,21 @@ var Core = function(options) {
 					text: "ERROR"
 				},
 
-				Debug: {
-
-					value: 0,
-					text: "DEBUG"
-				},
-
 				Test: {
 
-					value: 0,
+					value: 2,
 					text: "TEST"
+				},
+
+				Debug: {
+
+					value: 3,
+					text: "DEBUG"
 				},
 
 				Info: {
 
-					value: 0,
+					value: 4,
 					text: "Info"
 				},
 			}
@@ -67,8 +71,8 @@ var Core = function(options) {
 	var Lib = function(d) {
 
 		if ( arguments.callee._singletonInstance )
-    		return arguments.callee._singletonInstance;
-  		arguments.callee._singletonInstance = this;
+			return arguments.callee._singletonInstance;
+		arguments.callee._singletonInstance = this;
 
 		var exports = {};
 
@@ -87,24 +91,47 @@ var Core = function(options) {
 	var Logger = function() {
 
 		if ( arguments.callee._singletonInstance )
-    		return arguments.callee._singletonInstance;
-  		arguments.callee._singletonInstance = this;
+			return arguments.callee._singletonInstance;
+		arguments.callee._singletonInstance = this;
 
 		var exports = {};
 
-		exports.fatal = function(msg, context) {
+		exports.fatal = function(msg, context, arg) {
 
-			return push(msg, Config.LogLevel.Fatal, context);
+			return push(msg, Config.LogLevel.Fatal, context, arg);
 		}
 
-		function push(msg, level, context) {
+		exports.error = function(msg, context, arg) {
+
+			return push(msg, Config.LogLevel.Fatal, context, arg);
+		}
+
+		exports.test = function(msg, context, arg) {
+
+			return push(msg, Config.LogLevel.Fatal, context, arg);
+		}
+
+		exports.debug = function(msg, context, arg) {
+
+			return push(msg, Config.LogLevel.Fatal, context, arg);
+		}
+
+		exports.info = function(msg, context, arg) {
+
+			return push(msg, Config.LogLevel.Fatal, context, arg);
+		}
+
+		function push(msg, level, context, arg) {
 
 			context = context || "application";
 
 			var head = context.toLowerCase() + ": (";
 				head += level.text.toLowerCase() + ") ";
 
-			return console.log(head + msg);
+			console.log(head + msg);
+
+			if(arg)
+				console.log(arg);
 
 		}; exports.push = push;
 
@@ -120,8 +147,8 @@ var Core = function(options) {
 	var Broadcast = function() {
 
 		if ( arguments.callee._singletonInstance )
-    		return arguments.callee._singletonInstance;
-  		arguments.callee._singletonInstance = this;
+			return arguments.callee._singletonInstance;
+		arguments.callee._singletonInstance = this;
 
 		var exports = {};
 
@@ -154,6 +181,8 @@ var Core = function(options) {
 
 		function visitSubscribers(action, arg, type) {
 
+			core.log.info(type, "Broadcast", arg);
+
 			var pubtype = type || 'any';
 			var s = subscribers[pubtype];
 			var	i;
@@ -182,6 +211,51 @@ var Core = function(options) {
 
 	}; exports.broadcast = new Broadcast();
 
+	var Modules = function() {
+
+		var moduleData = {};
+
+		return {
+
+			include: function(name, callback) {
+
+				core.lib.jQuery.getScript("js/modules/" + name + ".js",
+
+				function(){
+
+					callback(name, window[name+"_module"]);
+
+				});
+			},
+
+			register: function (moduleId, creator) {
+
+				moduleData[moduleId] = {
+					creator: creator,
+					instance: null
+				};
+			},
+
+			start: function (moduleId) {
+
+				moduleData[moduleId].instance = 
+				moduleData[moduleId].creator(sandbox);
+				moduleData[moduleId].instance.init();
+			},
+
+			stop: function (moduleId) {
+
+				var data = moduleData[moduleId];
+
+				if (data.instance) {
+					data.instance.destroy();
+					data.instance = null;
+				}
+			}
+		}
+
+	}; exports.modules = new Modules();
+
 	function init() {
 
 		return exports;
@@ -193,9 +267,14 @@ var Core = function(options) {
 var core = new Core({
 
 	host: 'http://localhost:1337',
+
 	dependencies: [	
 		["jQuery", "$"],
 		["angular", "angular"]
+	],
+
+	modules: [
+		"user"
 	]
 });
 

@@ -1,5 +1,9 @@
 var Sandbox = function(core) {
 
+	if ( arguments.callee._singletonInstance )
+		return arguments.callee._singletonInstance;
+	arguments.callee._singletonInstance = this;
+
 	var exports = {};
 
 	// room observer pattern
@@ -24,6 +28,17 @@ var Sandbox = function(core) {
 	}; exports.model = model;
 
 	var init = function() {
+
+		var m = core.options.modules;
+
+		for(var i = 0; i < m.length; i++) {
+
+			core.modules.include(m[i], function(name, module){
+
+				core.modules.register(name, module);
+				core.modules.start(name);
+			});
+		}
 
 		return exports;
 	}

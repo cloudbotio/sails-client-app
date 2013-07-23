@@ -28,8 +28,13 @@ module.exports = {
 			minLength: 8,
 			required: true
 		},
+		
+		access_token: {
 
-		birthDate: 'DATE'
+			type: "string",
+			minLength: 8,
+			required: true
+		},
 	},
 
 	auth: function(email, password, callback) {
