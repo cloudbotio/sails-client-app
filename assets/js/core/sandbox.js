@@ -14,6 +14,15 @@ var Sandbox = function(core) {
 
 	}; exports.request = request;
 
+	// model webservice reflection
+	function model(path, callback) {
+
+		path = path || "";
+
+		return sandbox.request("/" + path, callback);
+
+	}; exports.model = model;
+
 	var init = function() {
 
 		return exports;
