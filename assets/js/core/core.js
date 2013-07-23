@@ -2,9 +2,122 @@ var Core = function(options) {
 
 	var exports = {};
 
+	function config() {
+
+		return  {
+
+			State: {
+
+				Development: {
+
+					level: 0,
+					text: "development"
+				},
+
+				Testing: {
+
+					level: 0,
+					text: "testing"
+				},
+
+				Production: {
+
+					level: 0,
+					text: "production"
+				},
+			},
+
+			LogLevel: {
+
+				Fatal: {
+
+					value: 0,
+					text: "FATAL ERROR"
+				},
+
+				Error: {
+
+					value: 1,
+					text: "ERROR"
+				},
+
+				Debug: {
+
+					value: 0,
+					text: "DEBUG"
+				},
+
+				Test: {
+
+					value: 0,
+					text: "TEST"
+				},
+
+				Info: {
+
+					value: 0,
+					text: "Info"
+				},
+			}
+		}
+	}; window.Config = config();
+
 	exports.socket = window.io.connect();
 
-	function Broadcast() {
+	var Lib = function(d) {
+
+		if ( arguments.callee._singletonInstance )
+    		return arguments.callee._singletonInstance;
+  		arguments.callee._singletonInstance = this;
+
+		var exports = {};
+
+		for(var i = 0; i < d.length; i++) {
+
+			exports[d[i][0]] = window[d[i][1]];
+
+			window[d[i][1]] = null
+			delete window[d[i][1]];
+		}
+
+		return exports;
+
+	}; exports.lib = new Lib(options.dependencies);
+
+	var Logger = function() {
+
+		if ( arguments.callee._singletonInstance )
+    		return arguments.callee._singletonInstance;
+  		arguments.callee._singletonInstance = this;
+
+		var exports = {};
+
+		exports.fatal = function(msg, context) {
+
+			return push(msg, Config.LogLevel.Fatal, context);
+		}
+
+		function push(msg, level, context) {
+
+			context = context || "application";
+
+			var head = context.toLowerCase() + ": (";
+				head += level.text.toLowerCase() + ") ";
+
+			return console.log(head + msg);
+
+		}; exports.push = push;
+
+		function init() {
+
+			return exports;
+		}
+
+		return init();
+
+	}; exports.log = new Logger();
+
+	var Broadcast = function() {
 
 		if ( arguments.callee._singletonInstance )
     		return arguments.callee._singletonInstance;
@@ -13,7 +126,7 @@ var Core = function(options) {
 		var exports = {};
 
 		var subscribers = {
-			any: [] // event type: subscribers
+			any: [] 
 		};
 		
 		function subscribe(type, fn) {
@@ -79,6 +192,10 @@ var Core = function(options) {
 
 var core = new Core({
 
-	host: 'http://localhost:1337'
+	host: 'http://localhost:1337',
+	dependencies: [	
+		["jQuery", "$"],
+		["angular", "angular"]
+	]
 });
 
