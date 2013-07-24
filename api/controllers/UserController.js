@@ -25,9 +25,9 @@ module.exports = {
 				}).done(function(err, response) {
 
 					if(err)
-							res.json(err);
+						res.json(err);
 					else 
-						res.json(response.serializeData(user[0]));
+						res.json(response.serializeData(user[0].toJSON()));
 				});
 			}
 		});
@@ -36,4 +36,5 @@ module.exports = {
 	signin: function() {
 		res.send("calma la champs");
 	}
-};
+	
+}

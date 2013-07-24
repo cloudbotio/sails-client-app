@@ -35,6 +35,16 @@ module.exports = {
 			minLength: 8,
 			required: true
 		},
+
+		toJSON: function() {
+
+			var obj = this.toObject();
+
+			delete obj.password;
+			delete obj.access_token;
+
+			return obj;
+		}
 	},
 
 	auth: function(email, password, callback) {
@@ -51,14 +61,4 @@ module.exports = {
 					callback(user.toJSON());
 		});
 	},
-
-	toJSON: function() {
-
-		var obj = this.toObject();
-
-		delete obj.password;
-
-		return obj;
-	}
-
 };

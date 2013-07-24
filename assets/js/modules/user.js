@@ -20,8 +20,8 @@ var user_module = function(sandbox) {
 				
 				else {
 
-					core.log.debug("Welcome, " + response.data.name+".", "User", response);
-					sandbox.publish("user/login/success", response);
+					core.log.debug("Welcome, " + response.data.name+".", "User");
+					sandbox.publish("user/login/success", response.data);
 				}
 		});
 

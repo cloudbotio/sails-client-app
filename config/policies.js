@@ -18,7 +18,11 @@ module.exports.policies = {
 
 	UserController: {
 
-		'*': 'authenticated'
+		'*': false,
+
+		'create': 'authenticated',
+		'login': 'authenticated',
+		'me': 'authenticated',
 	}
 };
 

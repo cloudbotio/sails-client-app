@@ -5,9 +5,13 @@
 var HomeController = {
 
 	index: function(req, res) {
+
+		//res.json({result: "error"});
+		//return;
+
 		res.view({
-            home: [{title: 'Sails'}]
-        });
+			title: 'Sails'
+		});
 	}
 
 };
