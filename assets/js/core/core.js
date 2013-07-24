@@ -291,7 +291,8 @@ var core = new Core({
 	],
 
 	modules: [
-		"user"
+		"user",
+		"sample"
 	]
 });
 

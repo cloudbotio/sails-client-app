@@ -30,6 +30,7 @@ module.exports = function (req, res, ok) {
 
 					req.session.authenticated = true;
 					req.session.user = user;
+					
 					return ok();
 				}
 

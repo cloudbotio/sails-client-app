@@ -27,10 +27,50 @@ var Sandbox = function(core) {
 	function model(path, callback) {
 
 		path = path || "";
+		callback = callback || function(){};
 
 		return sandbox.request("/" + path, callback);
 
 	}; exports.model = model;
+
+	function Adapter() {
+
+		var exports = {};
+		var adaptersData = {};
+
+		function register(name, options, callback) {
+
+			include(name, options, function(adapter){
+
+				sandbox.adapter[name] = new adapter(options);
+
+				callback = callback || function(){};
+				callback();
+			});
+
+		}; exports.register = register;
+
+		function include(name, options, callback) {
+
+			name = name || "";
+			callback = callback || function(){};
+			
+			core.lib.jQuery.getScript("js/adapters/" + name + "_adapter.js",
+			function(){
+
+				callback(window[name+"_adapter"]);
+
+			});
+
+		};
+
+		function init() {
+			return exports;
+		}
+
+		return init();
+
+	} exports.adapter = new Adapter();
 
 	var init = function() {
 
