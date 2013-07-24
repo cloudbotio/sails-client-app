@@ -12,9 +12,9 @@ var Sandbox = function(core) {
 	exports.publish = core.broadcast.publish;
 
 	// request methods
-	function request(url, callback){
+	function request(url, params, callback){
 
-		return core.socket.get(url, callback);
+		return core.socket.get(url, params, callback);
 
 	}; exports.request = request;
 
@@ -28,6 +28,9 @@ var Sandbox = function(core) {
 	}; exports.model = model;
 
 	var init = function() {
+
+		if(window.sandbox || sandbox)
+			return window.sandbox || sandbox;
 
 		var m = core.options.modules;
 
@@ -46,4 +49,4 @@ var Sandbox = function(core) {
 	return init();	
 };
 
-var sandbox = new Sandbox(core);
+var sandbox = window.sandbox = new Sandbox(core);

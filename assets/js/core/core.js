@@ -6,66 +6,6 @@ var Core = function(options) {
 
 	var exports = {options: options};
 
-	function config() {
-
-		return  {
-
-			State: {
-
-				Development: {
-
-					level: 0,
-					text: "development"
-				},
-
-				Testing: {
-
-					level: 1,
-					text: "testing"
-				},
-
-				Production: {
-
-					level: 2,
-					text: "production"
-				},
-			},
-
-			LogLevel: {
-
-				Fatal: {
-
-					value: 0,
-					text: "FATAL ERROR"
-				},
-
-				Error: {
-
-					value: 1,
-					text: "ERROR"
-				},
-
-				Test: {
-
-					value: 2,
-					text: "TEST"
-				},
-
-				Debug: {
-
-					value: 3,
-					text: "DEBUG"
-				},
-
-				Info: {
-
-					value: 4,
-					text: "Info"
-				},
-			}
-		}
-	}; window.Config = config();
-
 	exports.socket = window.io.connect();
 
 	var Lib = function(d) {
@@ -88,7 +28,7 @@ var Core = function(options) {
 
 	}; exports.lib = new Lib(options.dependencies);
 
-	var Logger = function() {
+	var Logger = function(state) {
 
 		if ( arguments.callee._singletonInstance )
 			return arguments.callee._singletonInstance;
@@ -103,25 +43,35 @@ var Core = function(options) {
 
 		exports.error = function(msg, context, arg) {
 
-			return push(msg, Config.LogLevel.Fatal, context, arg);
+			return push(msg, Config.LogLevel.Error, context, arg);
 		}
 
 		exports.test = function(msg, context, arg) {
 
-			return push(msg, Config.LogLevel.Fatal, context, arg);
+			return push(msg, Config.LogLevel.Test, context, arg);
 		}
 
 		exports.debug = function(msg, context, arg) {
 
-			return push(msg, Config.LogLevel.Fatal, context, arg);
+			return push(msg, Config.LogLevel.Debug, context, arg);
 		}
 
 		exports.info = function(msg, context, arg) {
 
-			return push(msg, Config.LogLevel.Fatal, context, arg);
+			return push(msg, Config.LogLevel.Info, context, arg);
+		}
+
+		function should_log(level) {
+
+			if(level.value <= options.state.level)
+				return true;
+
+			return false;
 		}
 
 		function push(msg, level, context, arg) {
+
+			if(!should_log(level)) return;
 
 			context = context || "application";
 
@@ -160,6 +110,10 @@ var Core = function(options) {
 
 			type = type || 'any';
 
+			// Uncomment to track subscriptions
+
+			//core.log.info("subscribe(" + type + ")", "Broadcast", {fn: fn});
+
 			if (typeof subscribers[type] === "undefined")
 				subscribers[type] = [];
 
@@ -181,7 +135,7 @@ var Core = function(options) {
 
 		function visitSubscribers(action, arg, type) {
 
-			core.log.info(type, "Broadcast", arg);
+			core.log.info(action + "(" + type + ")", "Broadcast", arg);
 
 			var pubtype = type || 'any';
 			var s = subscribers[pubtype];
@@ -240,7 +194,6 @@ var Core = function(options) {
 
 				moduleData[moduleId].instance = 
 				moduleData[moduleId].creator(sandbox);
-				moduleData[moduleId].instance.init();
 			},
 
 			stop: function (moduleId) {
@@ -264,9 +217,72 @@ var Core = function(options) {
 	return init();	
 };
 
+function config() {
+
+	return  {
+
+		State: {
+
+			Development: {
+
+				level: 4,
+				text: "development"
+			},
+
+			Testing: {
+
+				level: 2,
+				text: "testing"
+			},
+
+			Production: {
+
+				level: 1,
+				text: "production"
+			},
+		},
+
+		LogLevel: {
+
+			Fatal: {
+
+				value: 0,
+				text: "FATAL ERROR"
+			},
+
+			Error: {
+
+				value: 1,
+				text: "ERROR"
+			},
+
+			Test: {
+
+				value: 2,
+				text: "TEST"
+			},
+
+			Debug: {
+
+				value: 3,
+				text: "DEBUG"
+			},
+
+			Info: {
+
+				value: 4,
+				text: "Info"
+			},
+		}
+	}
+}; var Config = config();
+
 var core = new Core({
 
+	state: Config.State.Development,
+
 	host: 'http://localhost:1337',
+	access_token: "",
 
 	dependencies: [	
 		["jQuery", "$"],

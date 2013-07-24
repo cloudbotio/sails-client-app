@@ -6,6 +6,7 @@ var user_module = function(sandbox) {
 
 		sandbox.request("/User/login", data, 
 			function(response) {
+
 				if(response.result == "error") {
 
 					sandbox.publish("user/login/error", response);
@@ -16,11 +17,10 @@ var user_module = function(sandbox) {
 
 	function init() {
 
-		core.log.test("ola", "user");
+		core.log.debug("initializing user management module...", "user");
 
 		return exports;
-
-	}; exports.init = init;
+	};
 
 	return init();
 };

@@ -31,6 +31,9 @@ module.exports = {
 				});
 			}
 		});
+	},
 
+	signin: function() {
+		res.send("calma la champs");
 	}
 };
