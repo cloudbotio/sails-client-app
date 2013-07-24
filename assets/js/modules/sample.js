@@ -13,7 +13,6 @@ var sample_module = function(sandbox) {
 	function init() {
 
 		core.log.debug("initializing sample module...", "sample");
-
 		return exports;
 	};
 
