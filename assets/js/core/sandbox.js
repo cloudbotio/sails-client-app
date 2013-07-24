@@ -14,6 +14,11 @@ var Sandbox = function(core) {
 	// request methods
 	function request(url, params, callback){
 
+		if(params && params.authenticated) {
+			params.access_token = core.options.access_token;
+			delete params.authenticated;
+		}
+
 		return core.socket.get(url, params, callback);
 
 	}; exports.request = request;

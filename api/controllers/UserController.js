@@ -27,7 +27,7 @@ module.exports = {
 					if(err)
 							res.json(err);
 					else 
-						res.json(response.serializeData(user));
+						res.json(response.serializeData(user[0]));
 				});
 			}
 		});

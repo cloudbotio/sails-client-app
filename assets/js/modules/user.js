@@ -4,12 +4,24 @@ var user_module = function(sandbox) {
 
 	function login(data) {
 
-		sandbox.request("/User/login", data, 
+		data = data || {};
+
+		var params = {
+			email: data.email || "",
+			password: data.password || "",
+			authenticated: true
+		};
+
+		sandbox.request("/User/me", params, 
 			function(response) {
 
-				if(response.result == "error") {
-
+				if(response.result == "error") 
 					sandbox.publish("user/login/error", response);
+				
+				else {
+
+					core.log.debug("Welcome, " + response.data.name+".", "User", response);
+					sandbox.publish("user/login/success", response);
 				}
 		});
 

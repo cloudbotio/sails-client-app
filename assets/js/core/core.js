@@ -140,7 +140,8 @@ var Core = function(options) {
 			var pubtype = type || 'any';
 			var s = subscribers[pubtype];
 			var	i;
-			var max = s.length;
+
+			var max = (s? s.length : 0);
 
 			for (i = 0; i < max; i += 1) {
 
@@ -282,7 +283,7 @@ var core = new Core({
 	state: Config.State.Development,
 
 	host: 'http://localhost:1337',
-	access_token: "",
+	access_token: "rootroot",
 
 	dependencies: [	
 		["jQuery", "$"],
